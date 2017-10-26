@@ -50,8 +50,8 @@
     }
   },
   "variables": {
-    "nic1": "[concat('nic1',uniqueString(resourceGroup().id))]",
-    "nic2": "[concat('nic2',uniqueString(resourceGroup().id))]",
+    "nic1": "nic-101",
+    "nic2": "nic-201",
     "nicName": "[parameters('nicName')]",
     "publicIPAddressName": "[parameters('publicIPAddressName')]",
     "storageAccountName": "[parameters('storageaccountname')]",
@@ -65,10 +65,24 @@
   },
   "resources": [
      {
+      "apiVersion": "2017-06-01",
+      "location": "[resourceGroup().location]",
+      "name": "[variables('publicIPAddressName')]",
+      "properties": {
+        "publicIpAllocationMethod": "Dynamic"
+      },
+      "type": "Microsoft.Network/publicIPAddresses"
+    },
+     {
       "apiVersion": "2017-03-30",
       "type": "Microsoft.Compute/virtualMachines",
       "name": "[variables('vmName')]",
       "location": "[resourceGroup().location]",
+       "dependsOn": [
+                "[variables('nic1')]",
+                "[variables('nic2')]",
+                "[variables('publicIPAddressName')]"
+        ],
       "properties": {
         "hardwareProfile": {
           "vmSize": "[parameters('virtualMachineSize')]"
@@ -157,15 +171,6 @@
           }
         ]
       }
-    },   
-    {
-      "apiVersion": "2017-06-01",
-      "location": "[resourceGroup().location]",
-      "name": "[variables('publicIPAddressName')]",
-      "properties": {
-        "publicIpAllocationMethod": "Dynamic"
-      },
-      "type": "Microsoft.Network/publicIPAddresses"
     }
   ],
   "outputs": {
